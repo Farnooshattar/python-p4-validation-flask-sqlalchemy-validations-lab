@@ -41,5 +41,37 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
+    @validates('content')
+    def validates_content(self, key, value):
+        if len(value) < 250:
+            raise ValueError("post must at least have 250 characters")
+        return value
+
+    @validates('summary')
+    def validates_summary(self, key, value):
+        if len(value) >= 250:
+            raise ValueError("post must at most have 250 characters")
+        return value
+
+    @validates('category')
+    def validates_category(self, key, value):
+        if value not in ["Fiction", "Non-Fiction"]:
+            raise ValueError("post must be fiction or non-fiction")
+        return value
+    # this check is not required anymore!
+    # @validates('title')
+    # def validates_title(self, key, value):
+    #     if value == "":
+    #         raise ValueError("post must have a title")
+    #     return value
+
+    @validates('title')
+    def validates_click_bait(self, key, value):
+        clickbait_keywords = ["Won't Believe", "Secret",
+                              "Top", "Guess"]
+        if value not in clickbait_keywords:
+            raise ValueError("title in noy click_bait-y")
+        return value
+
     def __repr__(self):
         return f'Post(id={self.id}, title={self.title} content={self.content}, summary={self.summary})'
